@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/security/ProtectedRoute";
+import ErrorP from "./pages/Error";
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
         path="/"
         element={
           <ProtectedRoute profile="user">
-            <Home />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
@@ -22,6 +23,7 @@ function App() {
         } 
       />
       <Route path="/login" element={<Login />} />
+      <Route path="*" element={<ErrorP code={404} message="Page not found"/>} />
     </Routes>
   );
 }
