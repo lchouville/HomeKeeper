@@ -1,41 +1,28 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { login, type AuthUser } from "../services/authService";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      setUser(await login(identifier, password));
 
-    if (error) {
-      setError(error.message);
-      return;
+      console.log("Connecté :", user?.pseudo, user?.role);
+
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message);
     }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("pseudo, role")
-      .eq("id", data.user?.id)
-      .single();
-
-    if (profileError) {
-      setError(profileError.message);
-      return;
-    }
-
-    console.log("Connecté :", profile.pseudo, profile.role);
-
-    navigate("/"); 
   };
 
   return (
@@ -47,11 +34,11 @@ export default function Login() {
         <h1 className="text-white text-2xl font-bold">Connexion</h1>
 
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Email ou pseudo"
           className="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
           required
         />
 
