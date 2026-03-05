@@ -10,12 +10,17 @@ function App() {
       <Route
         path="/"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute profile="user">
             <Home />
           </ProtectedRoute>
         }
       />
-      <Route path="/register" element={<Register />} />
+      <Route path="/register" element={
+        //<ProtectedRoute profile="admin">
+          <Register />
+        //</ProtectedRoute>
+        } 
+      />
       <Route path="/login" element={<Login />} />
     </Routes>
   );

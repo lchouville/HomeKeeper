@@ -66,7 +66,34 @@ export async function logout() {
     currentUser = null;
 }
 
-export function getCurrentUser(): AuthUser | null {
-    console.log("Current user:", currentUser);
+export async function getCurrentUser(): Promise<AuthUser | null> {
+    if (currentUser) {
+        return currentUser;
+    }
+
+    const { data } = await supabase.auth.getSession();
+
+    if (!data.session) {
+        return null;
+    }
+
+    const userId = data.session.user.id;
+
+    const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("pseudo, role")
+        .eq("id", userId)
+        .single();
+
+    if (error || !profile) {
+        return null;
+    }
+
+    currentUser = {
+        id: userId,
+        pseudo: profile.pseudo,
+        role: profile.role,
+    };
+
     return currentUser;
 }

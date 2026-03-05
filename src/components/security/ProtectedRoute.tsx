@@ -1,18 +1,35 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { supabase } from "../../lib/supabase";
+import { getCurrentUser, type AuthUser } from "../../services/authService";
 
-export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<null | undefined | any>(undefined);
+export default function ProtectedRoute({
+  children,
+  profile = "user",
+}: {
+  children: ReactNode;
+  profile?: "user" | "admin";
+}) {
+  const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: { data: { user: any } }) => {
-      return setUser(data.user);
-    });
+    getCurrentUser().then(setUser);
   }, []);
 
-  if (user === undefined) return null;
-  if (!user) return <Navigate to="/login" />;
-  return children;
+  // chargement
+  if (user === undefined) {
+    return null;
+  }
+
+  // pas connecté
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // pas les droits
+  if (profile === "admin" && user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 }

@@ -27,7 +27,7 @@ export function Header({ page, user }: HeaderProps) {
         {user && <p className="text-white">{user.pseudo}</p>}
         <button
             onClick={handleLogout}
-            className="text-white hover:text-blue-400"
+            className="text-white hover:text-blue-400 cursor-pointer"
         >
             Déconnexion
         </button>
