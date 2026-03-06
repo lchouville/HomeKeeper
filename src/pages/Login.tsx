@@ -26,17 +26,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-900)]">
       <form
         onSubmit={handleLogin}
-        className="bg-slate-800 p-8 rounded-xl w-96 space-y-4"
+        className="bg-[var(--bg-800)] p-8 rounded-xl w-96 space-y-4"
       >
         <h1 className="text-white text-2xl font-bold">Connexion</h1>
 
         <input
           type="text"
           placeholder="Email ou pseudo"
-          className="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400"
+          className="w-full p-2 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
           required
@@ -45,7 +45,7 @@ export default function Login() {
         <input
           type="password"
           placeholder="Mot de passe"
-          className="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400"
+          className="w-full p-2 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -55,7 +55,7 @@ export default function Login() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
+          className="w-full bg-[var(--bg-500)] hover:bg-[var(--bg-600)] text-white p-2 rounded cursor-pointer transition-colors"
         >
           Se connecter
         </button>

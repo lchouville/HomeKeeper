@@ -9,7 +9,7 @@ interface ErrorPProps {
 }
 
 const ErrorP: React.FC<ErrorPProps> = ({ code, message }) => (
-    <div className="min-h-screen flex flex-col bg-slate-900">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-900)]">
         <Header page=""  user={null} />
         <div className="flex-1 flex flex-col items-center justify-center">
             <h1 className="text-white text-4xl font-bold mb-4">{code}</h1>

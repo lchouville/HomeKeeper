@@ -18,7 +18,7 @@ export function Header({ page, user }: HeaderProps) {
     };
 
     return (
-        <header className="bg-slate-800 p-4 flex justify-between items-center">
+        <header className="bg-[var(--bg-700)] p-4 flex justify-between items-center">
         <div>
             <h1><a href="/" className="text-2xl font-bold text-white cursor-pointer">HomeKeeper</a></h1>
             {page && <p className="text-sm text-slate-400">{page}</p>}

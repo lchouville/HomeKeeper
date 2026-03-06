@@ -3,10 +3,11 @@ import { Footer } from "../components/ui/Footer";
 import { Header } from "../components/ui/Header";
 import { getCurrentUser } from "../services/authService";
 import type { AuthUser } from "../services/authService";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import Sidebar from "../components/ui/Sidebar";
 
 function Dashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -18,16 +19,21 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900">
-      <Header page="dashboard" user={user}/>
-      <main className="flex-1 overflow-hidden">
-        <DashboardLayout>
-          <div className=" text-white">
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-          </div>
-        </DashboardLayout>
+    <div className="h-screen flex flex-col">
+      <Header page="dashboard" user={user} />
+
+      <main className="flex flex-1 overflow-hidden">
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
+
+        <div className="flex flex-1 bg-[var(--bg-200)]">
+          <h1 className="text-white">Dashboard</h1>
+        </div>
       </main>
-      <Footer/>
+
+      <Footer />
     </div>
   );
 }
