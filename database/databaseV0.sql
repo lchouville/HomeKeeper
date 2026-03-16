@@ -72,6 +72,28 @@ create table households (
   created_at timestamptz default now()
 );
 
+alter table households enable row level security;
+
+create policy "Household members can read their household"
+on households
+for select
+using (id in (select household_id from household_members where profile_id = auth.uid()));
+
+create policy "user can create a household"
+on households
+for insert
+with check (auth.role() = 'user' or auth.role() = 'admin');
+
+create policy "Household members can update their household"
+on households
+for update
+using (id in (select household_id from household_members where profile_id = auth.uid()));
+
+create policy "Household members can delete their household"
+on households
+for delete
+using (id in (select household_id from household_members where profile_id = auth.uid()));
+
 create table household_members (
   household_id uuid references households(id) on delete cascade,
   profile_id uuid references public.profiles(id) on delete cascade,
@@ -100,4 +122,39 @@ create policy "Household members can delete from their household"
 on household_members
 for delete
 using (profile_id = auth.uid());
+
+-- Stocks table
+create table stocks (
+  household uuid references households(id) on delete cascade,
+  product_name varchar(100) not null,
+  qty_needed int not null default 0,
+  qty_available int not null default 0,
+  unit varchar(20) not null default 'kg',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  primary key (household, product_name)
+);
+
+alter table stocks enable row level security;
+
+create policy "Household members can read stocks of their household"
+on stocks
+for select
+using (household in (select household_id from household_members where profile_id = auth.uid()));
+
+create policy "Household members can insert stocks of their household"
+on stocks
+for insert
+with check (household in (select household_id from household_members where profile_id = auth.uid
+()));
+
+create policy "Household members can update stocks of their household"
+on stocks
+for update
+using (household in (select household_id from household_members where profile_id = auth.uid()));
+
+create policy "Household members can delete stocks of their household"
+on stocks
+for delete
+using (household in (select household_id from household_members where profile_id = auth.uid()));
 

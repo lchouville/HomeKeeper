@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/security/ProtectedRoute";
 import ErrorP from "./pages/Error";
+import Stocks from "./pages/Stocks";
 
 function App() {
   return (
@@ -23,6 +24,11 @@ function App() {
         } 
       />
       <Route path="/login" element={<Login />} />
+      <Route path="/stocks" element={
+        <ProtectedRoute profile="user">
+          <Stocks />
+        </ProtectedRoute>
+      } />
       <Route path="*" element={<ErrorP code={404} message="Page not found"/>} />
     </Routes>
   );

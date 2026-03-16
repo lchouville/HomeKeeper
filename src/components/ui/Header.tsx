@@ -24,7 +24,9 @@ export function Header({ page, user }: HeaderProps) {
             {page && <p className="text-sm text-slate-400">{page}</p>}
         </div>
         <div>
-        {user && <p className="text-white">{user.pseudo}</p>}
+        <a href="/profile" className="text-white hover:text-blue-400 cursor-pointer">
+            {user && <p className="text-white">{user.pseudo}</p>}
+        </a>
         <button
             onClick={handleLogout}
             className="text-white hover:text-blue-400 cursor-pointer"
