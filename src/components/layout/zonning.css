@@ -1,0 +1,19 @@
+/* Met en evidance les zone en couleur pastel */
+.zonning .zg-blue {
+    background-color: rgba(0, 0, 255, 0.3);
+}
+.zonning .zg-green {
+    background-color: rgba(0, 255, 0, 0.3);
+}
+.zonning .zg-red {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+.zonning .zg-yellow {
+    background-color: rgba(255, 255, 0, 0.3);
+}
+.zonning .zg-purple {
+    background-color: rgba(128, 0, 128, 0.3);
+}
+.zonning .zg-brown {
+    background-color: rgba(165, 42, 42, 0.3);
+}

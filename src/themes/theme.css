@@ -1,0 +1,14 @@
+/* theme variables */
+:root { /* Light theme colors */
+    /* Background: white → night blue */
+    --bg-50:  #fefefe;   
+    --bg-100: #f0f4ff;   
+    --bg-200: #dbe7ff;  
+    --bg-300: #b8d0ff;  
+    --bg-400: #85a8ff;  
+    --bg-500: #4f80ff;  
+    --bg-600: #335fd6;  
+    --bg-700: #26479d;  
+    --bg-800: #1b3066;  
+    --bg-900: #0d1a33; 
+}
