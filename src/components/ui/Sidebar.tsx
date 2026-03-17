@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Wallet, Package, ShoppingCart, Menu, X } from "lucide-react";
+import { Home, Wallet, Package, ShoppingCart } from "lucide-react";
 
 interface SidebarProps {
   sidebarOpen: boolean;
