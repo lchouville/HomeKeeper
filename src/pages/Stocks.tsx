@@ -29,15 +29,16 @@ function Stocks() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const [newStock, setNewStock] = useState<Omit<Stock, 'last_updated'>>({
-    household: "",
+  const [newStock, setNewStock] = useState<Stock>({
+    householdId: "",
     product: "",
     qty_in_stock: 0,
     qty_needed: 0,
     unit: "kg",
+    last_updated: new Date().toISOString().split("T")[0],
   });
 
-  const getStockKey = (stock: Stock) => `${stock.household}-${stock.product}`;
+  const getStockKey = (stock: Stock) => `${stock.householdId}-${stock.product}`;
 
   // Fonction pour déterminer l'état du stock
   const getStockStatus = (stock: Stock): StockStatus => {
@@ -52,7 +53,6 @@ function Stocks() {
     }
   };
 
-  // Fonction pour obtenir le libellé du statut
   const getStatusLabel = (status: StockStatus) => {
     const labels = {
       overstock: "Sur stock",
@@ -63,7 +63,6 @@ function Stocks() {
     return labels[status];
   };
 
-  // Fonction pour obtenir la classe CSS du statut
   const getStatusClass = (status: StockStatus) => {
     const classes = {
       overstock: "bg-green-500",
@@ -74,23 +73,52 @@ function Stocks() {
     return classes[status];
   };
 
+  const startEditing = (stock: Stock) => {
+    const key = getStockKey(stock);
+    setEditingKey(key);
+    setEditStock({ ...stock });
+  };
+
+  const deleteStockLine = async (stock: Stock) => {
+    try {
+      await deleteStock(stock);
+      await loadProducts(selectedHousehold);
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+    }
+  };
+
+  const saveEditing = async () => {
+    if (!editStock) return;
+    try {
+      await updateStock(editStock);
+      await loadProducts(selectedHousehold);
+      setEditingKey(null);
+      setEditStock(null);
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde :", error);
+    }
+  };
+
+  const cancelEditing = () => {
+    setEditingKey(null);
+    setEditStock(null);
+  };
+
   // Filtrer et trier les stocks
   const filteredStocks = useMemo(() => {
     let result = [...allStocks];
 
-    // Filtre par terme de recherche
     if (searchTerm) {
       result = result.filter(stock =>
         stock.product.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filtre par statut
     if (statusFilter !== "all") {
       result = result.filter(stock => getStockStatus(stock) === statusFilter);
     }
 
-    // Tri
     result.sort((a, b) => {
       let valueA, valueB;
 
@@ -100,7 +128,7 @@ function Stocks() {
       } else if (sortBy === "qty_in_stock") {
         valueA = a.qty_in_stock;
         valueB = b.qty_in_stock;
-      } else { // last_updated
+      } else {
         valueA = new Date(a.last_updated).getTime();
         valueB = new Date(b.last_updated).getTime();
       }
@@ -124,19 +152,16 @@ function Stocks() {
     if (!selectedHousehold) return;
 
     try {
-      await addStock({
-        ...newStock,
-        household: selectedHousehold,
-        last_updated: new Date().toISOString()
-      });
+      await addStock(newStock,selectedHousehold);
 
       await loadProducts(selectedHousehold);
       setNewStock({
-        household: "",
+        householdId: "",
         product: "",
         qty_in_stock: 0,
         qty_needed: 0,
         unit: "kg",
+        last_updated: new Date().toISOString().split("T")[0],
       });
       setShowAddForm(false);
     } catch (error) {
@@ -149,13 +174,11 @@ function Stocks() {
       setSelectedHousehold(householdId);
       const products = await getStocks(householdId);
       setAllStocks(products);
-      setCurrentPage(1); // Réinitialiser la pagination
+      setCurrentPage(1);
     } catch (error) {
       console.error("Erreur chargement stocks :", error);
     }
   }
-
-  // ... (les autres fonctions restent inchangées)
 
   useEffect(() => {
     async function load() {
@@ -216,7 +239,6 @@ function Stocks() {
           {/* Barre de filtres */}
           <div className="mb-4 bg-[var(--bg-700)] p-4 rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Recherche */}
               <div>
                 <label className="text-white block mb-1">Rechercher</label>
                 <input
@@ -225,20 +247,19 @@ function Stocks() {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Réinitialiser la pagination
+                    setCurrentPage(1);
                   }}
                   className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
                 />
               </div>
 
-              {/* Filtre par statut */}
               <div>
                 <label className="text-white block mb-1">Statut</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => {
                     setStatusFilter(e.target.value as StockStatus | "all");
-                    setCurrentPage(1); // Réinitialiser la pagination
+                    setCurrentPage(1);
                   }}
                   className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
                 >
@@ -250,14 +271,13 @@ function Stocks() {
                 </select>
               </div>
 
-              {/* Tri par */}
               <div>
                 <label className="text-white block mb-1">Trier par</label>
                 <select
                   value={sortBy}
                   onChange={(e) => {
                     setSortBy(e.target.value as "product" | "qty_in_stock" | "last_updated");
-                    setCurrentPage(1); // Réinitialiser la pagination
+                    setCurrentPage(1);
                   }}
                   className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
                 >
@@ -267,14 +287,13 @@ function Stocks() {
                 </select>
               </div>
 
-              {/* Ordre de tri */}
               <div>
                 <label className="text-white block mb-1">Ordre</label>
                 <select
                   value={sortOrder}
                   onChange={(e) => {
                     setSortOrder(e.target.value as "asc" | "desc");
-                    setCurrentPage(1); // Réinitialiser la pagination
+                    setCurrentPage(1);
                   }}
                   className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
                 >
@@ -298,7 +317,60 @@ function Stocks() {
           {/* Formulaire d'ajout */}
           {showAddForm && (
             <div className="mb-6 bg-[var(--bg-700)] p-4 rounded-lg">
-              {/* ... (le formulaire d'ajout reste inchangé) */}
+              <h2 className="text-white font-semibold mb-3">Nouveau produit</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <label className="text-gray-400 text-sm block mb-1">Produit</label>
+                  <input
+                    type="text"
+                    placeholder="Nom du produit"
+                    value={newStock.product}
+                    onChange={(e) => setNewStock({ ...newStock, product: e.target.value })}
+                    className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-400 text-sm block mb-1">En stock</label>
+                  <input
+                    type="number"
+                    value={newStock.qty_in_stock}
+                    onChange={(e) => setNewStock({ ...newStock, qty_in_stock: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-400 text-sm block mb-1">Nécessaire</label>
+                  <input
+                    type="number"
+                    value={newStock.qty_needed}
+                    onChange={(e) => setNewStock({ ...newStock, qty_needed: Number(e.target.value) })}
+                    className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-400 text-sm block mb-1">Unité</label>
+                  <input
+                    type="text"
+                    value={newStock.unit}
+                    onChange={(e) => setNewStock({ ...newStock, unit: e.target.value })}
+                    className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={addStockLine}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                >
+                  ✅ Enregistrer
+                </button>
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  ✖️ Annuler
+                </button>
+              </div>
             </div>
           )}
 
@@ -322,7 +394,7 @@ function Stocks() {
             </div>
           </div>
 
-          {/* Liste des stocks avec tags de statut */}
+          {/* Liste des stocks */}
           <div className="space-y-4">
             {filteredStocks.length === 0 ? (
               <div className="text-center py-6 text-gray-400">
@@ -338,14 +410,65 @@ function Stocks() {
                   return (
                     <div key={stockKey} className="bg-[var(--bg-700)] rounded-lg p-4 relative">
                       {/* Tag de statut */}
-                      <div className={`absolute top-2 right-2 px-2 py-1 text-xs rounded-full ${getStatusClass(status)}`}>
+                      <div className={`absolute top-2 right-2 px-2 py-1 text-xs rounded-full text-white ${getStatusClass(status)}`}>
                         {getStatusLabel(status)}
                       </div>
 
-                      {isEditing ? (
-                        // Mode édition (inchangé)
+                      {isEditing && editStock ? (
+                        // Mode édition
                         <>
-                          {/* ... */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                              <label className="text-gray-400 text-sm block mb-1">Produit</label>
+                              <input
+                                type="text"
+                                value={editStock.product}
+                                onChange={(e) => setEditStock({ ...editStock, product: e.target.value })}
+                                className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-gray-400 text-sm block mb-1">En stock</label>
+                              <input
+                                type="number"
+                                value={editStock.qty_in_stock}
+                                onChange={(e) => setEditStock({ ...editStock, qty_in_stock: Number(e.target.value) })}
+                                className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-gray-400 text-sm block mb-1">Nécessaire</label>
+                              <input
+                                type="number"
+                                value={editStock.qty_needed}
+                                onChange={(e) => setEditStock({ ...editStock, qty_needed: Number(e.target.value) })}
+                                className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-gray-400 text-sm block mb-1">Unité</label>
+                              <input
+                                type="text"
+                                value={editStock.unit}
+                                onChange={(e) => setEditStock({ ...editStock, unit: e.target.value })}
+                                className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={saveEditing}
+                              className="bg-green-500 text-white px-4 py-2 rounded flex-1 hover:bg-green-600"
+                            >
+                              ✅ Sauvegarder
+                            </button>
+                            <button
+                              onClick={cancelEditing}
+                              className="bg-gray-500 text-white px-4 py-2 rounded flex-1 hover:bg-gray-600"
+                            >
+                              ✖️ Annuler
+                            </button>
+                          </div>
                         </>
                       ) : (
                         // Mode affichage
@@ -383,7 +506,7 @@ function Stocks() {
                               ✏️ Éditer
                             </button>
                             <button
-                              onClick={() => deleteStockLine(product)}
+                              onClick={() => deleteStockLine(product)} 
                               className="bg-red-500 text-white px-4 py-2 rounded flex-1 flex items-center justify-center gap-2 hover:bg-red-600"
                             >
                               🗑️ Supprimer
