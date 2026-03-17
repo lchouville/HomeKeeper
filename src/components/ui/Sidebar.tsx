@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { Home, Wallet, Package, ShoppingCart, Menu, X } from "lucide-react";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -6,73 +7,65 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
+  const location = useLocation();
+
+  const nav = [
+    { name: "Dashboard", path: "/", icon: Home },
+    { name: "Finances", path: "/finance", icon: Wallet },
+    { name: "Stock", path: "/stocks", icon: Package },
+    { name: "Courses", path: "/courses", icon: ShoppingCart },
+  ];
+
   return (
     <>
-      {/* Bouton pour ouvrir/fermer le menu sur mobile */}
-      <button
-        className="md:hidden bg-[var(--bg-800)] text-white rounded"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        {sidebarOpen ? "✕" : "☰"}
-      </button>
-
-      {/* Overlay pour fermer le menu en cliquant à côté */}
+      {/* Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed h-full inset-0 bg-black bg-opacity-0 md:hidden z-20"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Menu latéral */}
+      {/* Sidebar */}
       <aside
         className={`
-          fixed md:relative
-          z-30
-          h-full
-          w-64
-          bg-[var(--bg-800)]
-          transform
-          transition-transform
-          duration-300
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-          rounded
-          md:rounded-none
-        `}
+        fixed md:relative
+        z-50
+        h-full
+        w-64
+        bg-[var(--bg-800)]
+        shadow-xl
+        transform transition-transform duration-300
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0
+      `}
       >
-        <nav className="flex flex-col p-2 gap-2">
-          <Link
-            to="/"
-            className="p-2 rounded hover:bg-[var(--bg-600)] text-white"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Dashboard
-          </Link>
+        <nav className="flex flex-col p-4 gap-2 mt-10 md:mt-4">
+          {nav.map((item) => {
+            const Icon = item.icon;
+            const active = location.pathname === item.path;
 
-          <Link
-            to="/finance"
-            className="p-2 rounded hover:bg-[var(--bg-600)] text-white"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Finances
-          </Link>
-
-          <Link
-            to="/stocks"
-            className="p-2 rounded hover:bg-[var(--bg-600)] text-white"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Stock
-          </Link>
-
-          <Link
-            to="/courses"
-            className="p-2 rounded hover:bg-[var(--bg-600)] text-white"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Courses
-          </Link>
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`
+                flex items-center gap-3
+                p-3 rounded-lg
+                transition
+                ${
+                  active
+                    ? "bg-[var(--bg-600)] text-white"
+                    : "text-gray-300 hover:bg-[var(--bg-700)]"
+                }
+              `}
+              >
+                <Icon size={20} />
+                {item.name}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
     </>

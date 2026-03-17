@@ -5,6 +5,7 @@ import { getCurrentUser } from "../services/authService";
 import type { AuthUser } from "../services/authService";
 import Sidebar from "../components/ui/Sidebar";
 
+
 function Dashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -20,7 +21,12 @@ function Dashboard() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header page="dashboard" user={user} />
+      <Header 
+        page="dashboard" 
+        user={user} 
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       <main className="flex flex-1 overflow-hidden">
         <Sidebar

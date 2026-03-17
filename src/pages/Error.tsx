@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from '../components/ui/Header';
 import { Footer } from '../components/ui/Footer';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/ui/Sidebar';
 
 interface ErrorPProps {
     code: number;
@@ -22,6 +23,7 @@ const ErrorP: React.FC<ErrorPProps> = ({
     showHomeButton = true,
 }) => {
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
         
     // Utiliser le message par défaut si aucun message personnalisé n'est fourni
     const displayMessage = message || errorMessages[code] || 'Une erreur est survenue';
@@ -43,7 +45,17 @@ const ErrorP: React.FC<ErrorPProps> = ({
 
     return (
         <div className="min-h-screen flex flex-col bg-[var(--bg-900)]">
-            <Header page="" user={null} />
+            <Header 
+                page="Error" 
+                user={null} 
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+            />
+            <main className="flex flex-1 overflow-hidden">
+            <Sidebar
+                      sidebarOpen={sidebarOpen}
+                      setSidebarOpen={setSidebarOpen}
+                    />
             <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
                 {/* Code d'erreur */}
                 <h1 className={`text-6xl font-bold mb-4 ${getErrorStyle()}`}>
@@ -84,6 +96,8 @@ const ErrorP: React.FC<ErrorPProps> = ({
                 </div>
                 )}
             </div>
+                
+            </main>
             <Footer />
         </div>
     );

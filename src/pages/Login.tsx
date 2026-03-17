@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login, type AuthUser } from "../services/authService";
+import { login } from "../services/authService";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<AuthUser | null>(null);
 
   const navigate = useNavigate();
 
@@ -15,9 +14,9 @@ export default function Login() {
     setError(null);
 
     try {
-      setUser(await login(identifier, password));
+      const user = await login(identifier, password);
 
-      console.log("Connecté :", user?.pseudo, user?.role);
+      console.log("Connecté :", user.pseudo, user.role);
 
       navigate("/");
     } catch (err: any) {
@@ -36,7 +35,7 @@ export default function Login() {
         <input
           type="text"
           placeholder="Email ou pseudo"
-          className="w-full p-2 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
+          className="w-full p-3 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
           required
@@ -45,17 +44,19 @@ export default function Login() {
         <input
           type="password"
           placeholder="Mot de passe"
-          className="w-full p-2 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
+          className="w-full p-3 rounded bg-[var(--bg-700)] text-white placeholder-slate-400"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && (
+          <p className="text-red-400 text-sm">{error}</p>
+        )}
 
         <button
           type="submit"
-          className="w-full bg-[var(--bg-500)] hover:bg-[var(--bg-600)] text-white p-2 rounded cursor-pointer transition-colors"
+          className="w-full bg-[var(--bg-500)] hover:bg-[var(--bg-600)] text-white p-3 rounded transition"
         >
           Se connecter
         </button>

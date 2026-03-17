@@ -1,39 +1,75 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
+import { LogOut, Menu, User, X } from "lucide-react";
 
 type HeaderProps = {
-    page?: string;
-    user?: {
-        pseudo: string;
-        role: "user" | "admin";
-    } | null;
+  page?: string;
+  user?: {
+    pseudo: string;
+    role: "user" | "admin";
+  } | null;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 };
 
-export function Header({ page, user }: HeaderProps) {
-    const navigate = useNavigate();
+export function Header({ page, user,sidebarOpen,setSidebarOpen }: HeaderProps) {
+  const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        logout();
-        navigate("/login");
-    };
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
-    return (
-        <header className="bg-[var(--bg-700)] p-4 flex justify-between items-center">
-        <div>
-            <h1><a href="/" className="text-2xl font-bold text-white cursor-pointer">HomeKeeper</a></h1>
-            {page && <p className="text-sm text-slate-400">{page}</p>}
-        </div>
-        <div>
-        <a href="/profile" className="text-white hover:text-blue-400 cursor-pointer">
-            {user && <p className="text-white">{user.pseudo}</p>}
-        </a>
+  return (
+    <header className="bg-[var(--bg-700)] border-b border-[var(--bg-600)]">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-3">
+        {/* Burger */}
+        {/* burger mobile */}
         <button
-            onClick={handleLogout}
-            className="text-white hover:text-blue-400 cursor-pointer"
-        >
-            Déconnexion
+            className="md:hidden text-white z-[60]"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            >{sidebarOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
+
+        {/* Logo + page */}
+        <div className="flex flex-col">
+          <Link
+            to="/"
+            className="text-xl md:text-2xl font-bold text-white"
+          >
+            HomeKeeper
+          </Link>
+
+          {page && (
+            <span className="text-xs md:text-sm text-slate-400">
+              {page}
+            </span>
+          )}
         </div>
-        </header>
-    );
+
+        {/* User */}
+        <div className="flex items-center gap-3">
+
+          {user && (
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 text-white hover:text-blue-400 transition"
+            >
+              <User size={18} />
+              <span className="hidden sm:block">{user.pseudo}</span>
+            </Link>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-white hover:text-red-400 transition"
+          >
+            <LogOut size={18} />
+            <span className="hidden sm:block">Logout</span>
+          </button>
+
+        </div>
+      </div>
+    </header>
+  );
 }

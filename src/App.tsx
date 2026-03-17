@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/security/ProtectedRoute";
@@ -17,12 +16,12 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/register" element={
+      {/* <Route path="/register" element={
         //<ProtectedRoute profile="admin">
           <Register />
         //</ProtectedRoute>
         } 
-      />
+      /> */}
       <Route path="/login" element={<Login />} />
       <Route path="/stocks" element={
         <ProtectedRoute profile="user">
