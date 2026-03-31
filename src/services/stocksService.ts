@@ -3,10 +3,9 @@ import { supabase } from "../lib/supabase";
 
 export type Stock = {
   householdId: string;
-  product: string;
+  productId: string;
   qty_needed: number;
   qty_in_stock: number;
-  unit: string;
   last_updated: string;
 };
 
@@ -15,10 +14,9 @@ export async function getStocks(householdId: string): Promise<Stock[]> {
     .from("stocks")
     .select(`
       household,
-      product_name,
+      product,
       qty_needed,
       qty_available,
-      unit,
       updated_at
     `)
     .eq("household", householdId);
@@ -32,11 +30,10 @@ export async function getStocks(householdId: string): Promise<Stock[]> {
 
   return data.map((item) => ({
     householdId: item.household,
-    product: item.product_name,
+    productId: item.product,
     qty_needed: item.qty_needed,
     qty_in_stock: item.qty_available,
-    unit: item.unit,
-    last_updated: item.updated_at,
+    last_updated: item.updated_at
   }));
 }
 
@@ -50,10 +47,9 @@ export async function addStock(
     .from("stocks")
     .insert({
       household: household,
-      product_name: stock.product,
+      product: stock.productId,
       qty_needed: stock.qty_needed,
       qty_available: stock.qty_in_stock,
-      unit: stock.unit,
       updated_at: stock.last_updated,
     })
     .select()
@@ -66,10 +62,9 @@ export async function addStock(
 
   return {
     householdId: data.household,
-    product: data.product_name,
+    productId: data.product_name,
     qty_needed: data.qty_needed,
     qty_in_stock: data.qty_available,
-    unit: data.unit,
     last_updated: data.updated_at,
   };
 }
@@ -78,7 +73,7 @@ export async function deleteStock(stock: Stock) {
   const { error } = await supabase
     .from("stocks")
     .delete()
-    .eq("product_name", stock.product)
+    .eq("product", stock.productId)
     .eq("household", stock.householdId);
 
   if (error) {
@@ -93,11 +88,10 @@ export async function updateStock(stock: Stock): Promise<void> {
     .update({
       qty_available: stock.qty_in_stock,
       qty_needed: stock.qty_needed,
-      unit: stock.unit,
       updated_at: stock.last_updated,
     })
     .eq("household", stock.householdId)
-    .eq("product_name", stock.product);
+    .eq("product", stock.productId);
 
   if (error) throw error;
 }

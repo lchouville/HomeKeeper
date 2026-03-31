@@ -31,14 +31,13 @@ function Stocks() {
 
   const [newStock, setNewStock] = useState<Stock>({
     householdId: "",
-    product: "",
+    productId: "",
     qty_in_stock: 0,
     qty_needed: 0,
-    unit: "kg",
     last_updated: new Date().toISOString().split("T")[0],
   });
 
-  const getStockKey = (stock: Stock) => `${stock.householdId}-${stock.product}`;
+  const getStockKey = (stock: Stock) => `${stock.householdId}-${stock.productId}`;
 
   // Fonction pour déterminer l'état du stock
   const getStockStatus = (stock: Stock): StockStatus => {
@@ -111,7 +110,7 @@ function Stocks() {
 
     if (searchTerm) {
       result = result.filter(stock =>
-        stock.product.toLowerCase().includes(searchTerm.toLowerCase())
+        stock.productId.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -123,8 +122,8 @@ function Stocks() {
       let valueA, valueB;
 
       if (sortBy === "product") {
-        valueA = a.product.toLowerCase();
-        valueB = b.product.toLowerCase();
+        valueA = a.productId.toLowerCase();
+        valueB = b.productId.toLowerCase();
       } else if (sortBy === "qty_in_stock") {
         valueA = a.qty_in_stock;
         valueB = b.qty_in_stock;
@@ -157,10 +156,9 @@ function Stocks() {
       await loadProducts(selectedHousehold);
       setNewStock({
         householdId: "",
-        product: "",
+        productId: "",
         qty_in_stock: 0,
         qty_needed: 0,
-        unit: "kg",
         last_updated: new Date().toISOString().split("T")[0],
       });
       setShowAddForm(false);
@@ -324,8 +322,8 @@ function Stocks() {
                   <input
                     type="text"
                     placeholder="Nom du produit"
-                    value={newStock.product}
-                    onChange={(e) => setNewStock({ ...newStock, product: e.target.value })}
+                    value={newStock.productId}
+                    onChange={(e) => setNewStock({ ...newStock, productId: e.target.value })}
                     className="w-full px-3 py-2 bg-[var(--bg-500)] text-white rounded"
                   />
                 </div>

@@ -135,13 +135,12 @@
 
     create table stocks (
     household uuid references households(id) on delete cascade,
-    product_name varchar(100) not null,
+    product uuid references products(id)  on delete cascade,
     qty_needed float not null default 0,
     qty_available float not null default 0,
-    unit varchar(20) not null default 'kg',
     created_at timestamptz default now(),
     updated_at timestamptz default now(),
-    primary key (household, product_name)
+    primary key (household,product)
     );
 
     alter table stocks enable row level security;
@@ -167,4 +166,39 @@
     on stocks
     for delete
     using (household in (select household_id from household_members where profile_id = auth.uid()));
+
+--############--
+--# Products #--
+--############--
+    create table products (
+        id uuid primary key default gen_random_uuid(),
+        ean text unique,
+        name text not null,
+        qty integer default 0,
+        unit text,
+        created_at timestamptz default now()
+    );
+
+    alter table products enable row level security;
+
+    -- CRUD
+    create policy "user can create a product"
+    on products
+    for insert
+    with check (auth.role() = 'user' or auth.role() = 'admin');
+
+    create policy "user can read a product"
+    on products
+    for select
+    using (auth.role() = 'user' or auth.role() = 'admin');
+
+    create policy "user can delete a product"
+    on products
+    for delete
+    using (auth.role() = 'user' or auth.role() = 'admin');
+
+    create policy "user can update a product"
+    on products
+    for update
+    with check (auth.role() = 'user' or auth.role() = 'admin');
 
