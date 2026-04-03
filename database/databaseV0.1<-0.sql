@@ -2,9 +2,9 @@
 --# Products #--
 --############--
     create table products (
-        id uuid primary key default gen_random_uuid(),
+        product uuid primary key default gen_random_uuid(),
         ean text unique,
-        name text not null,
+        name text unique not null,
         qty integer default 0,
         unit text,
         created_at timestamptz default now()
